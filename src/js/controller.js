@@ -35,8 +35,4 @@ const searchController = async function(){
 searchview.addHandlerEvent(searchController);
 showRecipe();
 recipeview.addHandler(showRecipe);
-
-
-
-
-
+// initial

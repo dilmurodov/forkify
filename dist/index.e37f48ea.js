@@ -545,7 +545,7 @@ const searchController = async function() {
 };
 _searchViewJsDefault.default.addHandlerEvent(searchController);
 showRecipe();
-_recipeViewJsDefault.default.addHandler(showRecipe);
+_recipeViewJsDefault.default.addHandler(showRecipe); // initial
 
 },{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./model.js":"Y4A21","./views/recipeView.js":"l60JC","./views/searchView.js":"9OQAM","./views/resultsView.js":"cSbZE"}],"dXNgZ":[function(require,module,exports) {
 /**
