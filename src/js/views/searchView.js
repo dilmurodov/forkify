@@ -2,15 +2,14 @@ class SearchView {
     #data;
     #parentElement = document.querySelector('.search');
 
-    getSearch(hand){
-        this.#parentElement.addEventListener('submit', e => {
+    searchInput(handled){
+        return this.#parentElement.addEventListener('submit', e => {
             e.preventDefault();
             const inputValue = this.#parentElement.querySelector('.search__field').value;
-            console.log(inputValue);
-            // hand();
+            // console.log(inputValue);
+            handled(inputValue);
         })
     }
-
 }
 
 export default new SearchView();

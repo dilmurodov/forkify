@@ -5,6 +5,7 @@ import { getJSON } from "./helpers.js"
 
 export const state = {
     recipe: {},
+    search: {},
 }
 
 export const getRecipe = async function() {
@@ -26,5 +27,15 @@ export const getRecipe = async function() {
 }
 
 export const getSearch = async function (val){
-    const data = await getJSON(API_URL + val)
+    const data = await getJSON(API_URL + '?search=' + val);
+    console.log(data);
+    const {recipes: searchRes} = data.data;
+    state.search = searchRes.map(item => {
+        return {
+            id: item.id,
+            img: item.image_url,
+            publisher: item.publisher,
+            title: item.title
+        }
+    })
 }
