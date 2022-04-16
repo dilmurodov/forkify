@@ -534,16 +534,18 @@ const showRecipe = async function() {
     await _modelJs.getRecipe();
     _recipeViewJsDefault.default.render(_modelJs.state.recipe);
 };
-const toSearchView = function() {
-    _searchViewJsDefault.default.searchInput(_modelJs.getSearch);
-    _resultsViewJsDefault.default.render();
+const searchController = async function() {
+    try {
+        const inpVal = _searchViewJsDefault.default.getQuery();
+        await _modelJs.getSearch(inpVal);
+        _resultsViewJsDefault.default.render(_modelJs.state.search);
+    } catch (err) {
+        console.log(err);
+    }
 };
-toSearchView();
-const showResSearch = async function(inputValue) {
-    await _modelJs.getSearch(val);
-};
+_searchViewJsDefault.default.addHandlerEvent(searchController);
 
-},{"./model.js":"Y4A21","./views/recipeView.js":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","regenerator-runtime":"dXNgZ","./views/searchView.js":"9OQAM","./views/resultsView.js":"cSbZE"}],"Y4A21":[function(require,module,exports) {
+},{"./model.js":"Y4A21","./views/recipeView.js":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView.js":"9OQAM","./views/resultsView.js":"cSbZE","regenerator-runtime":"dXNgZ"}],"Y4A21":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state
@@ -557,7 +559,10 @@ var _configJs = require("./config.js");
 var _helpersJs = require("./helpers.js");
 const state = {
     recipe: {},
-    search: {}
+    search: {
+        query: [],
+        results: {}
+    }
 };
 const getRecipe = async function() {
     const id = window.location.hash.slice(1);
@@ -577,17 +582,22 @@ const getRecipe = async function() {
 // console.log(state.recipe);
 };
 const getSearch = async function(val) {
-    const data = await _helpersJs.getJSON(_configJs.API_URL + '?search=' + val);
-    console.log(data);
-    const { recipes: searchRes  } = data.data;
-    state.search = searchRes.map((item)=>{
-        return {
-            id: item.id,
-            img: item.image_url,
-            publisher: item.publisher,
-            title: item.title
-        };
-    });
+    try {
+        const data = await _helpersJs.getJSON(_configJs.API_URL + '?search=' + val);
+        console.log(data);
+        const { recipes: searchRes  } = data.data;
+        state.search.query.push(val);
+        state.search.results = searchRes.map((item)=>{
+            return {
+                id: item.id,
+                img: item.image_url,
+                publisher: item.publisher,
+                title: item.title
+            };
+        });
+    } catch (err) {
+        alert(err);
+    }
 };
 
 },{"./config.js":"k5Hzs","./helpers.js":"hGI1E","regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
@@ -1243,7 +1253,7 @@ class RecipeView {
     }
      #renderIng() {
         const ingreds = this.#data.ing;
-        console.log(ingreds);
+        // console.log(ingreds);
         return ingreds.map((item)=>{
             return `<li class="recipe__ingredient">
       <svg class="recipe__icon">
@@ -1361,7 +1371,7 @@ class RecipeView {
 }
 exports.default = new RecipeView();
 
-},{"../../img/icons.svg":"cMpiy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cMpiy":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../../img/icons.svg":"cMpiy"}],"cMpiy":[function(require,module,exports) {
 module.exports = require('./helpers/bundle-url').getBundleURL('hWUTQ') + "icons.21bad73c.svg" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -1404,12 +1414,14 @@ parcelHelpers.defineInteropFlag(exports);
 class SearchView {
     #data;
     #parentElement = document.querySelector('.search');
-    searchInput(handled) {
-        return this.#parentElement.addEventListener('submit', (e)=>{
+    getQuery() {
+        const inputValue = this.#parentElement.querySelector('.search__field').value;
+        return inputValue;
+    }
+    addHandlerEvent(handled) {
+        this.#parentElement.addEventListener('submit', (e)=>{
             e.preventDefault();
-            const inputValue = this.#parentElement.querySelector('.search__field').value;
-            // console.log(inputValue);
-            handled(inputValue);
+            handled();
         });
     }
 }
@@ -1422,25 +1434,28 @@ var _iconsSvg = require("../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class resultsView {
     #data;
-    #parentElement = document.querySelector(".results");
-    render() {
+    #parentElement = document.querySelector('.results');
+    render(data) {
+        this.#data = data;
         this.#clearHTML();
         this.#renderResults();
     }
      #clearHTML() {
-        this.#parentElement.innerHTML = "";
+        this.#parentElement.innerHTML = '';
     }
      #renderResults() {
         const recipe = this.#data;
-        const html = `
+        console.log(recipe);
+        recipe.results.forEach((item)=>{
+            const html = `
         <li class="preview">
-            <a class="preview__link preview__link--active" href="${recipe.id}">
+            <a class="preview__link preview__link--active" href="#${item.id}">
               <figure class="preview__fig">
-                <img src="${recipe.img}" alt="Test" />
+                <img src="${item.img}" alt="Test"/>
               </figure>
               <div class="preview__data">
-                <h4 class="preview__title">${recipe.title}</h4>
-                <p class="preview__publisher">${recipe.publisher}</p>
+                <h4 class="preview__title">${item.title}</h4>
+                <p class="preview__publisher">${item.publisher}</p>
                 <div class="preview__user-generated">
                   <svg>
                     <use href="${_iconsSvgDefault.default}#icon-user"></use>
@@ -1449,11 +1464,12 @@ class resultsView {
               </div>
             </a>
           </li>`;
-        this.#parentElement.insertAdjacentHTML('afterbegin', html);
+            this.#parentElement.insertAdjacentHTML('afterbegin', html);
+        });
     }
 }
 exports.default = new resultsView();
 
-},{"../../img/icons.svg":"cMpiy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["ddCAb","aenu9"], "aenu9", "parcelRequire72b5")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../../img/icons.svg":"cMpiy"}]},["ddCAb","aenu9"], "aenu9", "parcelRequire72b5")
 
 //# sourceMappingURL=index.e37f48ea.js.map

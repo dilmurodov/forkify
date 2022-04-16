@@ -15,7 +15,7 @@ class RecipeView {
 
   #renderIng() {
     const ingreds = this.#data.ing;
-    console.log(ingreds);
+    // console.log(ingreds);
     return ingreds.map(item => {
       return `<li class="recipe__ingredient">
       <svg class="recipe__icon">

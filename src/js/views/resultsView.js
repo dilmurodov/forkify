@@ -1,29 +1,32 @@
-import icons from "../../img/icons.svg"
+import icons from '../../img/icons.svg';
 
-class resultsView{
-    #data;
-    #parentElement = document.querySelector(".results");
+class resultsView {
+  #data;
+  #parentElement = document.querySelector('.results');
 
-    render(){
-        this.#clearHTML();
-        this.#renderResults();
-    }
-    
-    #clearHTML(){
-        this.#parentElement.innerHTML = ""
-    }
-    
-    #renderResults(){
-        const recipe = this.#data;
-        const html = `
+  render(data) {
+    this.#data = data;
+    this.#clearHTML();
+    this.#renderResults();
+  }
+
+  #clearHTML() {
+    this.#parentElement.innerHTML = '';
+  }
+
+  #renderResults() {
+    const recipe = this.#data;
+    console.log(recipe);
+    recipe.results.forEach(item => {
+      const html = `
         <li class="preview">
-            <a class="preview__link preview__link--active" href="${recipe.id}">
+            <a class="preview__link preview__link--active" href="#${item.id}">
               <figure class="preview__fig">
-                <img src="${recipe.img}" alt="Test" />
+                <img src="${item.img}" alt="Test"/>
               </figure>
               <div class="preview__data">
-                <h4 class="preview__title">${recipe.title}</h4>
-                <p class="preview__publisher">${recipe.publisher}</p>
+                <h4 class="preview__title">${item.title}</h4>
+                <p class="preview__publisher">${item.publisher}</p>
                 <div class="preview__user-generated">
                   <svg>
                     <use href="${icons}#icon-user"></use>
@@ -31,9 +34,10 @@ class resultsView{
                 </div>
               </div>
             </a>
-          </li>`
-          this.#parentElement.insertAdjacentHTML('afterbegin', html);
-    }
+          </li>`;
+      this.#parentElement.insertAdjacentHTML('afterbegin', html);
+    });
+  }
 }
 
 export default new resultsView();
