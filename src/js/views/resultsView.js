@@ -17,7 +17,7 @@ class resultsView {
   #renderResults() {
     const recipe = this.#data;
     console.log(recipe);
-    recipe.results.forEach(item => {
+    recipe.forEach(item => {
       const html = `
         <li class="preview">
             <a class="preview__link preview__link--active" href="#${item.id}">

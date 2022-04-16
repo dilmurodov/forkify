@@ -523,6 +523,8 @@ var _searchViewJs = require("./views/searchView.js");
 var _searchViewJsDefault = parcelHelpers.interopDefault(_searchViewJs);
 var _resultsViewJs = require("./views/resultsView.js");
 var _resultsViewJsDefault = parcelHelpers.interopDefault(_resultsViewJs);
+var _paginationViewJs = require("./views/paginationView.js");
+var _paginationViewJsDefault = parcelHelpers.interopDefault(_paginationViewJs);
 [
     'hashchange',
     'load'
@@ -538,14 +540,22 @@ const searchController = async function() {
     try {
         const inpVal = _searchViewJsDefault.default.getQuery();
         await _modelJs.getSearch(inpVal);
-        _resultsViewJsDefault.default.render(_modelJs.state.search);
+        const data = await _modelJs.getPaginationRecipes();
+        _resultsViewJsDefault.default.render(data);
+        _paginationViewJsDefault.default.render(_modelJs.state.search);
     } catch (err) {
         console.log(err);
     }
 };
+const paginationController = async function(page) {
+    const data = await _modelJs.getPaginationRecipes(page);
+    _resultsViewJsDefault.default.render(data);
+    _paginationViewJsDefault.default.render(_modelJs.state.search);
+};
 _searchViewJsDefault.default.addHandlerEvent(searchController);
+_paginationViewJsDefault.default.addHandlerEvent(paginationController);
 
-},{"./model.js":"Y4A21","./views/recipeView.js":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView.js":"9OQAM","./views/resultsView.js":"cSbZE","regenerator-runtime":"dXNgZ"}],"Y4A21":[function(require,module,exports) {
+},{"./model.js":"Y4A21","./views/recipeView.js":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView.js":"9OQAM","./views/resultsView.js":"cSbZE","regenerator-runtime":"dXNgZ","./views/paginationView.js":"6z7bi"}],"Y4A21":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state
@@ -554,6 +564,8 @@ parcelHelpers.export(exports, "getRecipe", ()=>getRecipe
 );
 parcelHelpers.export(exports, "getSearch", ()=>getSearch
 );
+parcelHelpers.export(exports, "getPaginationRecipes", ()=>getPaginationRecipes
+);
 var _regeneratorRuntime = require("regenerator-runtime");
 var _configJs = require("./config.js");
 var _helpersJs = require("./helpers.js");
@@ -561,7 +573,9 @@ const state = {
     recipe: {},
     search: {
         query: [],
-        results: {}
+        results: {},
+        page: 1,
+        perPage: _configJs.RESP_PER_PAGE
     }
 };
 const getRecipe = async function() {
@@ -599,6 +613,16 @@ const getSearch = async function(val) {
         alert(err);
     }
 };
+const getPaginationRecipes = async function(page = state.search.page) {
+    try {
+        state.search.page = page;
+        const startIndex = (page - 1) * _configJs.RESP_PER_PAGE;
+        const lastIndex = page * _configJs.RESP_PER_PAGE;
+        return state.search.results.slice(startIndex, lastIndex);
+    } catch (err) {
+        alert(err);
+    }
+};
 
 },{"./config.js":"k5Hzs","./helpers.js":"hGI1E","regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -607,8 +631,11 @@ parcelHelpers.export(exports, "API_URL", ()=>API_URL
 );
 parcelHelpers.export(exports, "TIMEOUT_SEC", ()=>TIMEOUT_SEC
 );
+parcelHelpers.export(exports, "RESP_PER_PAGE", ()=>RESP_PER_PAGE
+);
 const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
 const TIMEOUT_SEC = 5;
+const RESP_PER_PAGE = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -1446,7 +1473,7 @@ class resultsView {
      #renderResults() {
         const recipe = this.#data;
         console.log(recipe);
-        recipe.results.forEach((item)=>{
+        recipe.forEach((item)=>{
             const html = `
         <li class="preview">
             <a class="preview__link preview__link--active" href="#${item.id}">
@@ -1469,6 +1496,51 @@ class resultsView {
     }
 }
 exports.default = new resultsView();
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../../img/icons.svg":"cMpiy"}],"6z7bi":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _iconsSvg = require("../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+class PaginationView {
+    #parentElement = document.querySelector('.pagination');
+    #data;
+    addHandlerEvent(handle) {
+        this.#parentElement.addEventListener('click', (e)=>{
+            if (!e.target.closest(".btn--inline")) return;
+            handle(+e.target.closest(".btn--inline").getAttribute("data-id"));
+        });
+    }
+    render(data) {
+        this.#data = data; // state.search
+        console.log(this.#data);
+        this.#clearBnts();
+        this.#renderBtns();
+    }
+     #clearBnts() {
+        this.#parentElement.innerHTML = '';
+    }
+     #renderBtns() {
+        const currentPage = this.#data.page;
+        const lastPage = Math.ceil(this.#data.results.length / this.#data.perPage);
+        console.log(currentPage, lastPage);
+        const btnPrev = `<button class="btn--inline pagination__btn--prev" data-id=${currentPage - 1}>
+      <svg class="search__icon">
+        <use href="${_iconsSvgDefault.default}#icon-arrow-left"></use>
+      </svg>
+      <span>Page ${currentPage - 1}</span>
+    </button>`;
+        const btnNext = `<button class="btn--inline pagination__btn--next" data-id=${currentPage + 1}>
+      <span>Page ${currentPage + 1}</span>
+      <svg class="search__icon">
+        <use href="${_iconsSvgDefault.default}#icon-arrow-right"></use>
+      </svg>
+    </button>`;
+        if (currentPage > 1) this.#parentElement.insertAdjacentHTML('afterbegin', btnPrev);
+        if (currentPage < lastPage) this.#parentElement.insertAdjacentHTML('afterbegin', btnNext);
+    }
+}
+exports.default = new PaginationView();
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../../img/icons.svg":"cMpiy"}]},["ddCAb","aenu9"], "aenu9", "parcelRequire72b5")
 
