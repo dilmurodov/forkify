@@ -1808,7 +1808,7 @@ class PaginationView {
 }
 exports.default = new PaginationView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../../img/icons.svg":"cMpiy"}],"cMpiy":[function(require,module,exports) {
+},{"../../img/icons.svg":"cMpiy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cMpiy":[function(require,module,exports) {
 module.exports = require('./helpers/bundle-url').getBundleURL('hWUTQ') + "icons.21bad73c.svg" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"lgJ39"}]},["ddCAb","aenu9"], "aenu9", "parcelRequire72b5")
