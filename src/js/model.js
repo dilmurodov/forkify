@@ -63,3 +63,12 @@ export const paginationLogic = function(page = state.search.page) {
     console.log(state.search.results.slice(start, last));
     return state.search.results.slice(start, last);
 }
+
+export const udateServings = function(numPeople = state.recipe.servings){
+  
+  state.recipe.ingredients = state.recipe.ingredients.map(item => {
+    item.quantity = ((item.quantity*numPeople)/state.recipe.servings);
+    return item;
+  });
+  state.recipe.servings = numPeople;
+}

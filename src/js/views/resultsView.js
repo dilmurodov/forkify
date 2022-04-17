@@ -5,6 +5,17 @@ class ResultsView {
     #parentElement = document.querySelector(".results");
     #data;
 
+  
+    loadingSpinner() {
+      this.#clearHTML();
+      let html = `<div class="spinner">
+        <svg>
+          <use href="${icons}#icon-loader"></use>
+        </svg>
+      </div>`;
+      this.#parentElement.insertAdjacentHTML('afterbegin', html);
+    }
+
     render(data){
         this.#data = data;
         this.#clearHTML();

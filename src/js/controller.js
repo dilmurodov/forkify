@@ -22,9 +22,8 @@ const showRecipe = async function () {
 
     await model.loadRecipe(id);
 
-    const data = model.state.recipe;
+    servingsController();
 
-    recipeview.render(data);
   } catch (err) {
     recipeview.renderError();
   }
@@ -35,6 +34,7 @@ const searchController = async function () {
     const inputValue = searchview.getQuery();
 
     // console.log(inputValue);
+    resultsView.loadingSpinner();
 
     await model.searchResults(inputValue);
 
@@ -58,7 +58,16 @@ const paginationController = async function (page) {
   }
 };
 
+const servingsController = function(servings){
+  
+  model.udateServings(servings);
+  console.log(model.state.recipe)
+  const data = model.state.recipe;
+  recipeview.render(data);
+}
+
 searchview.addHandlerEvent(searchController);
 showRecipe();
 recipeview.addHandler(showRecipe);
 paginationView.addHandlerEvent(paginationController)
+recipeview.addHandlerServings(servingsController);

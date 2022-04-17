@@ -72,12 +72,12 @@ class RecipeView {
           <span class="recipe__info-text">servings</span>
       
           <div class="recipe__info-buttons">
-            <button class="btn--tiny btn--increase-servings">
+            <button data-id=${(this.#data.servings-1) > 1 ? (this.#data.servings-1) : 1} class="btn--tiny btn--increase-servings">
               <svg>
                 <use href="${icons}#icon-minus-circle"></use>
               </svg>
             </button>
-            <button class="btn--tiny btn--increase-servings">
+            <button data-id=${(this.#data.servings+1) < 20 ? this.#data.servings+1 : 20} class="btn--tiny btn--increase-servings">
               <svg>
                 <use href="${icons}#icon-plus-circle"></use>
               </svg>
@@ -130,6 +130,16 @@ class RecipeView {
       ['hashchange', 'load'].forEach(item => {
           addEventListener(item, data);
       })
+  }
+
+  addHandlerServings(handle){
+    this.#parentElement.addEventListener('click', function(e){
+      const btn = e.target.closest('.btn--tiny');
+      if(!btn) return;
+      const servings = +e.target.closest('.btn--tiny').getAttribute('data-id');
+      console.log(servings);
+      handle(servings)
+    }.bind(this))
   }
   renderError(){
       let html = `<div class="error">

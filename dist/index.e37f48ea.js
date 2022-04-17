@@ -532,8 +532,7 @@ const showRecipe = async function() {
         if (!id) return;
         _recipeViewJsDefault.default.loadingSpinner();
         await _modelJs.loadRecipe(id);
-        const data = _modelJs.state.recipe;
-        _recipeViewJsDefault.default.render(data);
+        servingsController();
     } catch (err) {
         _recipeViewJsDefault.default.renderError();
     }
@@ -542,6 +541,7 @@ const searchController = async function() {
     try {
         const inputValue = _searchViewJsDefault.default.getQuery();
         // console.log(inputValue);
+        _resultsViewJsDefault.default.loadingSpinner();
         await _modelJs.searchResults(inputValue);
         const data = _modelJs.paginationLogic();
         _paginationViewJsDefault.default.render(_modelJs.state.search);
@@ -559,12 +559,19 @@ const paginationController = async function(page) {
         alert(err);
     }
 };
+const servingsController = function(servings) {
+    _modelJs.udateServings(servings);
+    console.log(_modelJs.state.recipe);
+    const data = _modelJs.state.recipe;
+    _recipeViewJsDefault.default.render(data);
+};
 _searchViewJsDefault.default.addHandlerEvent(searchController);
 showRecipe();
 _recipeViewJsDefault.default.addHandler(showRecipe);
 _paginationViewJsDefault.default.addHandlerEvent(paginationController);
+_recipeViewJsDefault.default.addHandlerServings(servingsController);
 
-},{"./model.js":"Y4A21","./views/recipeView.js":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView.js":"9OQAM","./views/resultsView.js":"cSbZE","regenerator-runtime":"dXNgZ","./views/paginationView.js":"6z7bi"}],"Y4A21":[function(require,module,exports) {
+},{"./model.js":"Y4A21","./views/recipeView.js":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView.js":"9OQAM","./views/resultsView.js":"cSbZE","./views/paginationView.js":"6z7bi","regenerator-runtime":"dXNgZ"}],"Y4A21":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state
@@ -574,6 +581,8 @@ parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe
 parcelHelpers.export(exports, "searchResults", ()=>searchResults
 );
 parcelHelpers.export(exports, "paginationLogic", ()=>paginationLogic
+);
+parcelHelpers.export(exports, "udateServings", ()=>udateServings
 );
 var _regeneratorRuntime = require("regenerator-runtime");
 var _configJs = require("./config.js");
@@ -630,6 +639,13 @@ const paginationLogic = function(page = state.search.page) {
     const last = state.search.PerPage * page;
     console.log(state.search.results.slice(start, last));
     return state.search.results.slice(start, last);
+};
+const udateServings = function(numPeople = state.recipe.servings) {
+    state.recipe.ingredients = state.recipe.ingredients.map((item)=>{
+        item.quantity = item.quantity * numPeople / state.recipe.servings;
+        return item;
+    });
+    state.recipe.servings = numPeople;
 };
 
 },{"./config.js":"k5Hzs","./helpers.js":"hGI1E","regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
@@ -1335,12 +1351,12 @@ class RecipeView {
           <span class="recipe__info-text">servings</span>
       
           <div class="recipe__info-buttons">
-            <button class="btn--tiny btn--increase-servings">
+            <button data-id=${this.#data.servings - 1 > 1 ? this.#data.servings - 1 : 1} class="btn--tiny btn--increase-servings">
               <svg>
                 <use href="${_iconsSvgDefault.default}#icon-minus-circle"></use>
               </svg>
             </button>
-            <button class="btn--tiny btn--increase-servings">
+            <button data-id=${this.#data.servings + 1 < 20 ? this.#data.servings + 1 : 20} class="btn--tiny btn--increase-servings">
               <svg>
                 <use href="${_iconsSvgDefault.default}#icon-plus-circle"></use>
               </svg>
@@ -1394,6 +1410,15 @@ class RecipeView {
         ].forEach((item)=>{
             addEventListener(item, data);
         });
+    }
+    addHandlerServings(handle) {
+        this.#parentElement.addEventListener('click', (function(e) {
+            const btn = e.target.closest('.btn--tiny');
+            if (!btn) return;
+            const servings = +e.target.closest('.btn--tiny').getAttribute('data-id');
+            console.log(servings);
+            handle(servings);
+        }).bind(this));
     }
     renderError() {
         let html = `<div class="error">
@@ -1726,6 +1751,15 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class ResultsView {
     #parentElement = document.querySelector(".results");
     #data;
+    loadingSpinner() {
+        this.#clearHTML();
+        let html = `<div class="spinner">
+        <svg>
+          <use href="${_iconsSvgDefault.default}#icon-loader"></use>
+        </svg>
+      </div>`;
+        this.#parentElement.insertAdjacentHTML('afterbegin', html);
+    }
     render(data) {
         this.#data = data;
         this.#clearHTML();
@@ -1792,13 +1826,13 @@ class PaginationView {
           <button class="btn--inline pagination__btn--next" data-id=${currentPage + 1}>
             <span>Page ${currentPage + 1}</span>
             <svg class="search__icon">
-              <use href="src/img/icons.svg#icon-arrow-right"></use>
+              <use href="${_iconsSvgDefault.default}#icon-arrow-right"></use>
             </svg>
           </button>`;
         const btnPrev = `
           <button class="btn--inline pagination__btn--prev" data-id=${currentPage - 1}>
             <svg class="search__icon">
-              <use href="src/img/icons.svg#icon-arrow-left"></use>
+              <use href="${_iconsSvgDefault.default}#icon-arrow-left"></use>
             </svg>
             <span>Page ${currentPage - 1}</span>
           </button>`;

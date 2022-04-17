@@ -36,7 +36,7 @@ class PaginationView {
           }>
             <span>Page ${currentPage + 1}</span>
             <svg class="search__icon">
-              <use href="src/img/icons.svg#icon-arrow-right"></use>
+              <use href="${icons}#icon-arrow-right"></use>
             </svg>
           </button>`;
     const btnPrev = `
@@ -44,7 +44,7 @@ class PaginationView {
             currentPage - 1
           }>
             <svg class="search__icon">
-              <use href="src/img/icons.svg#icon-arrow-left"></use>
+              <use href="${icons}#icon-arrow-left"></use>
             </svg>
             <span>Page ${currentPage - 1}</span>
           </button>`;
