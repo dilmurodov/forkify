@@ -15,6 +15,7 @@ import paginationView from "./views/paginationView.js"
 
 const showRecipe = async function (){
   await model.getRecipe();
+  servingsConroller();
   recipeView.render(model.state.recipe);
 }
 
@@ -36,6 +37,10 @@ const paginationController = async function (page) {
   paginationView.render(model.state.search);
 }
 
+const servingsConroller = function(){
+  model.updateServings(10);
+  console.log(model.state.recipe);
+}
 
 searchView.addHandlerEvent(searchController);
 paginationView.addHandlerEvent(paginationController);

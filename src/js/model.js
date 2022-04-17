@@ -63,3 +63,12 @@ export const getPaginationRecipes = async function(page = state.search.page){
     alert(err)
   }
 }
+
+export const updateServings = function(peopleNum){
+
+  state.recipe.ingredients.map(item => {
+    item.quentity = (item.quentity*peopleNum / item.servings).toPrecision(1);
+
+  })
+
+}

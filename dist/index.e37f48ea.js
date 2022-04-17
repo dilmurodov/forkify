@@ -534,6 +534,7 @@ var _paginationViewJsDefault = parcelHelpers.interopDefault(_paginationViewJs);
 );
 const showRecipe = async function() {
     await _modelJs.getRecipe();
+    servingsConroller();
     _recipeViewJsDefault.default.render(_modelJs.state.recipe);
 };
 const searchController = async function() {
@@ -552,6 +553,10 @@ const paginationController = async function(page) {
     _resultsViewJsDefault.default.render(data);
     _paginationViewJsDefault.default.render(_modelJs.state.search);
 };
+const servingsConroller = function() {
+    _modelJs.updateServings(10);
+    console.log(_modelJs.state.recipe);
+};
 _searchViewJsDefault.default.addHandlerEvent(searchController);
 _paginationViewJsDefault.default.addHandlerEvent(paginationController);
 
@@ -565,6 +570,8 @@ parcelHelpers.export(exports, "getRecipe", ()=>getRecipe
 parcelHelpers.export(exports, "getSearch", ()=>getSearch
 );
 parcelHelpers.export(exports, "getPaginationRecipes", ()=>getPaginationRecipes
+);
+parcelHelpers.export(exports, "updateServings", ()=>updateServings
 );
 var _regeneratorRuntime = require("regenerator-runtime");
 var _configJs = require("./config.js");
@@ -622,6 +629,11 @@ const getPaginationRecipes = async function(page = state.search.page) {
     } catch (err) {
         alert(err);
     }
+};
+const updateServings = function(peopleNum) {
+    state.recipe.ingredients.map((item)=>{
+        item.quentity = (item.quentity * peopleNum / item.servings).toPrecision(1);
+    });
 };
 
 },{"./config.js":"k5Hzs","./helpers.js":"hGI1E","regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
@@ -1542,6 +1554,6 @@ class PaginationView {
 }
 exports.default = new PaginationView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../../img/icons.svg":"cMpiy"}]},["ddCAb","aenu9"], "aenu9", "parcelRequire72b5")
+},{"../../img/icons.svg":"cMpiy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["ddCAb","aenu9"], "aenu9", "parcelRequire72b5")
 
 //# sourceMappingURL=index.e37f48ea.js.map
