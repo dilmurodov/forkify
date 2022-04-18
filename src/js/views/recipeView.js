@@ -91,8 +91,8 @@ class RecipeView {
           </svg>
         </div>
         <button class="btn--round">
-          <svg class="">
-            <use href="${icons}#icon-bookmark-fill"></use>
+          <svg >
+            <use data-id="false" class="bookmark__svg" href="${icons}#icon-bookmark${this.#data.bookmarked ? '-fill' : ''}"></use>
           </svg>
         </button>
       </div>
@@ -130,6 +130,16 @@ class RecipeView {
       ['hashchange', 'load'].forEach(item => {
           addEventListener(item, data);
       })
+  }
+
+  addHandleBookmark(handle){
+    this.#parentElement.addEventListener('click', function(e){
+      const bookmark = e.target.closest(".btn--round");
+      if(!bookmark) return;
+      
+      handle(this.#data)
+
+    }.bind(this))
   }
 
   addHandlerServings(handle){

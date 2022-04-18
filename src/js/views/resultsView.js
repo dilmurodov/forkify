@@ -28,7 +28,7 @@ class ResultsView {
     }
     #generateHTML(obj){
         let html = `<li class="preview">
-        <a class="preview__link preview__link--active" href="#${obj.id}">
+        <a class="preview__link " href="#${obj.id}">
           <figure class="preview__fig">
             <img src="${obj.image}" alt="Test" />
           </figure>
